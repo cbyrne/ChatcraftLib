@@ -66,7 +66,7 @@ class ChatDSLTest {
         )
         assertEquals(
             StringChatComponent("placeholder").apply { italic = false },
-            chat { string("placeholder") italic  false }
+            chat { string("placeholder") italic false }
         )
         assertEquals(
             StringChatComponent("placeholder").apply { underlined = false },

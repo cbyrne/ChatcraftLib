@@ -1,4 +1,5 @@
 @file:JvmName("CryptoUtil")
+
 package dev.zerite.craftlib.protocol.util
 
 import java.security.*

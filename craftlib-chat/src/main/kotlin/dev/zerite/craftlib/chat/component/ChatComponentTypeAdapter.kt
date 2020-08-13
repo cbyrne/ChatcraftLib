@@ -1,4 +1,5 @@
 @file:JvmName("ChatComponentUtil")
+
 package dev.zerite.craftlib.chat.component
 
 import com.google.gson.*

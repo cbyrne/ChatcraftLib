@@ -1,5 +1,0 @@
-description = 'Reads and writes the NBT format'
-
-dependencies {
-    api project(':craftlib-commons')
-}

@@ -1,4 +1,5 @@
 @file:JvmName("StringUtil")
+
 package dev.zerite.craftlib.protocol.util.ext
 
 import java.util.*

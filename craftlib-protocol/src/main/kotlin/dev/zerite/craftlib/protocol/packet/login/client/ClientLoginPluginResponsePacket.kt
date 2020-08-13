@@ -15,13 +15,14 @@ import dev.zerite.craftlib.protocol.version.ProtocolVersion
  *
  * @author Decobr
  */
-data class ClientLoginPluginResponsePacket(var messageID: Int, var successful: Boolean, var data: ByteArray? = null) : Packet() {
+data class ClientLoginPluginResponsePacket(var messageID: Int, var successful: Boolean, var data: ByteArray? = null) :
+    Packet() {
     companion object : PacketIO<ClientLoginPluginResponsePacket> {
         override fun read(
             buffer: ProtocolBuffer,
             version: ProtocolVersion,
             connection: NettyConnection
-        ) = ClientLoginPluginResponsePacket (
+        ) = ClientLoginPluginResponsePacket(
             buffer.readVarInt(),
             buffer.readBoolean(),
             buffer.readByteArray()

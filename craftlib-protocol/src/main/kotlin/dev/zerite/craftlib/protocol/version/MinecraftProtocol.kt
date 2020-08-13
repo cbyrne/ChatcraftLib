@@ -9,15 +9,17 @@ import dev.zerite.craftlib.protocol.connection.io.PacketCodec
 import dev.zerite.craftlib.protocol.packet.handshake.client.ClientHandshakePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginEncryptionResponsePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginStartPacket
-import dev.zerite.craftlib.protocol.packet.login.server.*
+import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginDisconnectPacket
+import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginEncryptionRequestPacket
+import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSetCompressionPacket
+import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSuccessPacket
 import dev.zerite.craftlib.protocol.packet.play.client.display.ClientPlayChatMessagePacket
 import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayClientStatusPacket
 import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayKeepAlivePacket
-import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayTabCompletePacket
-import dev.zerite.craftlib.protocol.packet.play.client.player.ClientPlayPlayerPacket
 import dev.zerite.craftlib.protocol.packet.play.server.display.ServerPlayChatMessagePacket
-import dev.zerite.craftlib.protocol.packet.play.server.join.ServerPlayJoinGamePacket
-import dev.zerite.craftlib.protocol.packet.play.server.other.*
+import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlayDisconnectPacket
+import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlayKeepAlivePacket
+import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlaySetCompressionPacket
 import dev.zerite.craftlib.protocol.packet.status.client.ClientStatusPingPacket
 import dev.zerite.craftlib.protocol.packet.status.client.ClientStatusRequestPacket
 import dev.zerite.craftlib.protocol.packet.status.server.ServerStatusPingPacket
@@ -51,7 +53,6 @@ import java.net.InetAddress
  * @since  0.1.0-SNAPSHOT
  */
 object MinecraftProtocol : AbstractProtocol() {
-
     /**
      * The initial state for all new connections, only listening
      * for a packet from the client.
@@ -85,83 +86,11 @@ object MinecraftProtocol : AbstractProtocol() {
                 ProtocolVersion.MC1_13 to 0x01
                 ProtocolVersion.MC1_14 to 0x03
             }
-            /*ClientPlayUseEntityPacket {
-                ProtocolVersion.MC1_7_2 to 0x02
-            }
-            ClientPlayPlayerPacket {
-                ProtocolVersion.MC1_7_2 to 0x03
-                ProtocolVersion.MC1_9 to 0x0F
-                ProtocolVersion.MC1_14 to 0x14
-            }*/
-            /*ClientPlayPlayerPositionPacket {
-                ProtocolVersion.MC1_7_2 to 0x04
-            }
-            ClientPlayPlayerLookPacket {
-                ProtocolVersion.MC1_7_2 to 0x05
-            }
-            ClientPlayPlayerPositionLookPacket {
-                ProtocolVersion.MC1_7_2 to 0x06
-            }
-            ClientPlayPlayerDiggingPacket {
-                ProtocolVersion.MC1_7_2 to 0x07
-            }
-            ClientPlayPlayerBlockPlacementPacket {
-                ProtocolVersion.MC1_7_2 to 0x08
-            }
-            ClientPlayPlayerHeldItemChangePacket {
-                ProtocolVersion.MC1_7_2 to 0x09
-            }
-            ClientPlayAnimationPacket {
-                ProtocolVersion.MC1_7_2 to 0x0A
-            }
-            ClientPlayEntityActionPacket {
-                ProtocolVersion.MC1_7_2 to 0x0B
-            }
-            ClientPlayPlayerSteerVehiclePacket {
-                ProtocolVersion.MC1_7_2 to 0x0C
-            }
-            ClientPlayCloseWindowPacket {
-                ProtocolVersion.MC1_7_2 to 0x0D
-            }
-            ClientPlayClickWindowPacket {
-                ProtocolVersion.MC1_7_2 to 0x0E
-            }
-            ClientPlayConfirmTransactionPacket {
-                ProtocolVersion.MC1_7_2 to 0x0F
-            }
-            ClientPlayCreativeInventoryActionPacket {
-                ProtocolVersion.MC1_7_2 to 0x10
-            }
-            ClientPlayEnchantItemPacket {
-                ProtocolVersion.MC1_7_2 to 0x11
-            }
-            ClientPlayUpdateSignPacket {
-                ProtocolVersion.MC1_7_2 to 0x12
-            }
-            ClientPlayPlayerAbilitiesPacket {
-                ProtocolVersion.MC1_7_2 to 0x13
-            }
-            ClientPlayTabCompletePacket {
-                ProtocolVersion.MC1_7_2 to 0x14
-                ProtocolVersion.MC1_9 to 0x01
-            }*/
-            /*ClientPlayClientSettingsPacket {
-                ProtocolVersion.MC1_7_2 to 0x15
-            }*/
             ClientPlayClientStatusPacket {
                 ProtocolVersion.MC1_7_2 to 0x16
                 ProtocolVersion.MC1_9 to 0x03
                 ProtocolVersion.MC1_13 to 0x02
             }
-            /*ClientPlayPluginMessagePacket {
-                ProtocolVersion.MC1_7_2 to 0x17
-            }
-            ClientPlaySpectatePacket {
-                ProtocolVersion.MC1_8 to 0x18
-            }
-            ClientPlayResourcePackStatusPacket {
-                ProtocolVersion.MC1_8 to 0x19
-            }*/
         }
         clientbound {
             ServerPlayKeepAlivePacket {
@@ -172,12 +101,6 @@ object MinecraftProtocol : AbstractProtocol() {
                 ProtocolVersion.MC1_15 to 0x21
                 ProtocolVersion.MC1_16 to 0x20
             }
-            /*ServerPlayJoinGamePacket {
-                ProtocolVersion.MC1_7_2 to 0x01
-                ProtocolVersion.MC1_9 to 0x23
-                ProtocolVersion.MC1_13 to 0x25
-                ProtocolVersion.MC1_14 to 0x26
-            }*/
             ServerPlayChatMessagePacket {
                 ProtocolVersion.MC1_7_2 to 0x02
                 ProtocolVersion.MC1_9 to 0x0F
@@ -185,194 +108,12 @@ object MinecraftProtocol : AbstractProtocol() {
                 ProtocolVersion.MC1_14 to 0x0F
                 ProtocolVersion.MC1_16 to 0x0E
             }
-            /*ServerPlayTimeUpdatePacket {
-                ProtocolVersion.MC1_7_2 to 0x03
-            }
-            ServerPlayEntityEquipmentPacket {
-                ProtocolVersion.MC1_7_2 to 0x04
-            }
-            ServerPlaySpawnPositionPacket {
-                ProtocolVersion.MC1_7_2 to 0x05
-            }
-            ServerPlayUpdateHealthPacket {
-                ProtocolVersion.MC1_7_2 to 0x06
-            }*/
-            ServerPlayRespawnPacket {
+            // TODO
+            /*ServerPlayRespawnPacket {
                 ProtocolVersion.MC1_7_2 to 0x07
                 ProtocolVersion.MC1_9 to 0x33
                 ProtocolVersion.MC1_14 to 0x3A
                 ProtocolVersion.MC1_15 to 0x3B
-                ProtocolVersion.MC1_16 to -1
-            }
-            /*ServerPlayPlayerPositionLookPacket {
-                ProtocolVersion.MC1_7_2 to 0x08
-            }
-            ServerPlayHeldItemChangePacket {
-                ProtocolVersion.MC1_7_2 to 0x09
-            }
-            ServerPlayUseBedPacket {
-                ProtocolVersion.MC1_7_2 to 0x0A
-            }
-            ServerPlayAnimationPacket {
-                ProtocolVersion.MC1_7_2 to 0x0B
-            }
-            ServerPlaySpawnPlayerPacket {
-                ProtocolVersion.MC1_7_2 to 0x0C
-            }
-            ServerPlayCollectItemPacket {
-                ProtocolVersion.MC1_7_2 to 0x0D
-            }
-            ServerPlaySpawnObjectPacket {
-                ProtocolVersion.MC1_7_2 to 0x0E
-            }
-            ServerPlaySpawnMobPacket {
-                ProtocolVersion.MC1_7_2 to 0x0F
-            }
-            ServerPlaySpawnPaintingPacket {
-                ProtocolVersion.MC1_7_2 to 0x10
-            }
-            ServerPlaySpawnExperienceOrbPacket {
-                ProtocolVersion.MC1_7_2 to 0x11
-            }
-            ServerPlayEntityVelocityPacket {
-                ProtocolVersion.MC1_7_2 to 0x12
-            }
-            ServerPlayDestroyEntitiesPacket {
-                ProtocolVersion.MC1_7_2 to 0x13
-            }
-            ServerPlayEntityPacket {
-                ProtocolVersion.MC1_7_2 to 0x14
-            }
-            ServerPlayEntityRelativeMovePacket {
-                ProtocolVersion.MC1_7_2 to 0x15
-            }
-            ServerPlayEntityLookPacket {
-                ProtocolVersion.MC1_7_2 to 0x16
-            }
-            ServerPlayEntityLookRelativeMovePacket {
-                ProtocolVersion.MC1_7_2 to 0x17
-            }
-            ServerPlayEntityTeleportPacket {
-                ProtocolVersion.MC1_7_2 to 0x18
-            }
-            ServerPlayEntityHeadLookPacket {
-                ProtocolVersion.MC1_7_2 to 0x19
-            }
-            ServerPlayEntityStatusPacket {
-                ProtocolVersion.MC1_7_2 to 0x1A
-            }
-            ServerPlayAttachEntityPacket {
-                ProtocolVersion.MC1_7_2 to 0x1B
-            }
-            ServerPlayEntityMetadataPacket {
-                ProtocolVersion.MC1_7_2 to 0x1C
-            }
-            ServerPlayEntityEffectPacket {
-                ProtocolVersion.MC1_7_2 to 0x1D
-            }
-            ServerPlayRemoveEntityEffectPacket {
-                ProtocolVersion.MC1_7_2 to 0x1E
-            }
-            ServerPlaySetExperiencePacket {
-                ProtocolVersion.MC1_7_2 to 0x1F
-            }
-            ServerPlayEntityPropertiesPacket {
-                ProtocolVersion.MC1_7_2 to 0x20
-            }
-            ServerPlayChunkDataPacket {
-                ProtocolVersion.MC1_7_2 to 0x21
-            }
-            ServerPlayMultiBlockChangePacket {
-                ProtocolVersion.MC1_7_2 to 0x22
-            }
-            ServerPlayBlockChangePacket {
-                ProtocolVersion.MC1_7_2 to 0x23
-            }
-            ServerPlayBlockActionPacket {
-                ProtocolVersion.MC1_7_2 to 0x24
-            }
-            ServerPlayBlockBreakAnimationPacket {
-                ProtocolVersion.MC1_7_2 to 0x25
-            }
-            ServerPlayMapChunkBulkPacket {
-                ProtocolVersion.MC1_7_2 to 0x26
-            }
-            ServerPlayExplosionPacket {
-                ProtocolVersion.MC1_7_2 to 0x27
-            }
-            ServerPlayEffectPacket {
-                ProtocolVersion.MC1_7_2 to 0x28
-            }
-            ServerPlaySoundEffectPacket {
-                ProtocolVersion.MC1_7_2 to 0x29
-            }
-            ServerPlayParticlePacket {
-                ProtocolVersion.MC1_7_2 to 0x2A
-            }
-            ServerPlayChangeGameStatePacket {
-                ProtocolVersion.MC1_7_2 to 0x2B
-            }
-            ServerPlaySpawnGlobalEntityPacket {
-                ProtocolVersion.MC1_7_2 to 0x2C
-            }
-            ServerPlayOpenWindowPacket {
-                ProtocolVersion.MC1_7_2 to 0x2D
-            }
-            ServerPlayCloseWindowPacket {
-                ProtocolVersion.MC1_7_2 to 0x2E
-            }
-            ServerPlaySetSlotPacket {
-                ProtocolVersion.MC1_7_2 to 0x2F
-            }
-            ServerPlayWindowItemsPacket {
-                ProtocolVersion.MC1_7_2 to 0x30
-            }
-            ServerPlayWindowPropertyPacket {
-                ProtocolVersion.MC1_7_2 to 0x31
-            }
-            ServerPlayConfirmTransactionPacket {
-                ProtocolVersion.MC1_7_2 to 0x32
-            }
-            ServerPlayUpdateSignPacket {
-                ProtocolVersion.MC1_7_2 to 0x33
-            }
-            ServerPlayMapsPacket {
-                ProtocolVersion.MC1_7_2 to 0x34
-            }
-            ServerPlayUpdateBlockEntityPacket {
-                ProtocolVersion.MC1_7_2 to 0x35
-            }
-            ServerPlaySignEditorOpenPacket {
-                ProtocolVersion.MC1_7_2 to 0x36
-            }
-            ServerPlayStatisticsPacket {
-                ProtocolVersion.MC1_7_2 to 0x37
-            }
-            ServerPlayPlayerListItemPacket {
-                ProtocolVersion.MC1_7_2 to 0x38
-            }
-            ServerPlayPlayerAbilitiesPacket {
-                ProtocolVersion.MC1_7_2 to 0x39
-            }
-            ServerPlayTabCompletePacket {
-                ProtocolVersion.MC1_7_2 to 0x3A
-                ProtocolVersion.MC1_9 to 0x0E
-                ProtocolVersion.MC1_13 to 0x05
-            }*/
-            /*ServerPlayScoreboardObjectivePacket {
-                ProtocolVersion.MC1_7_2 to 0x3B
-            }
-            ServerPlayUpdateScorePacket {
-                ProtocolVersion.MC1_7_2 to 0x3C
-            }
-            ServerPlayDisplayScoreboardPacket {
-                ProtocolVersion.MC1_7_2 to 0x3D
-            }
-            ServerPlayTeamsPacket {
-                ProtocolVersion.MC1_7_2 to 0x3E
-            }
-            ServerPlayPluginMessagePacket {
-                ProtocolVersion.MC1_7_2 to 0x3F
             }*/
             ServerPlayDisconnectPacket {
                 ProtocolVersion.MC1_7_2 to 0x40
@@ -382,34 +123,10 @@ object MinecraftProtocol : AbstractProtocol() {
                 ProtocolVersion.MC1_15 to 0x1B
                 ProtocolVersion.MC1_16 to 0x1A
             }
-            /*ServerPlayServerDifficultyPacket {
-                ProtocolVersion.MC1_8 to 0x41
-            }
-            ServerPlayCombatEventPacket {
-                ProtocolVersion.MC1_8 to 0x42
-            }
-            ServerPlayCameraPacket {
-                ProtocolVersion.MC1_8 to 0x43
-            }
-            ServerPlayWorldBorderPacket {
-                ProtocolVersion.MC1_8 to 0x44
-            }
-            ServerPlayTitlePacket {
-                ProtocolVersion.MC1_8 to 0x45
-            }*/
             ServerPlaySetCompressionPacket {
                 ProtocolVersion.MC1_8 to 0x46
                 ProtocolVersion.MC1_9 to -1
             }
-            /*ServerPlayPlayerListHeaderFooterPacket {
-                ProtocolVersion.MC1_8 to 0x47
-            }
-            ServerPlayResourcePackSendPacket {
-                ProtocolVersion.MC1_8 to 0x48
-            }
-            ServerPlayUpdateEntityNBTPacket {
-                ProtocolVersion.MC1_8 to 0x49
-            }*/
         }
     }
 

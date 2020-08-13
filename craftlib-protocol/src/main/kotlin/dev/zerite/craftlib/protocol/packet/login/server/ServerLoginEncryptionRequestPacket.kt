@@ -27,7 +27,8 @@ data class ServerLoginEncryptionRequestPacket(
             connection: NettyConnection
         ) = ServerLoginEncryptionRequestPacket(
             buffer.readString(),
-            buffer.readByteArray { if (version >= ProtocolVersion.MC1_8) readVarInt() else readShort().toInt() }.asPublicKey(),
+            buffer.readByteArray { if (version >= ProtocolVersion.MC1_8) readVarInt() else readShort().toInt() }
+                .asPublicKey(),
             buffer.readByteArray { if (version >= ProtocolVersion.MC1_8) readVarInt() else readShort().toInt() }
         )
 
@@ -38,8 +39,16 @@ data class ServerLoginEncryptionRequestPacket(
             connection: NettyConnection
         ) {
             buffer.writeString(packet.serverId)
-            buffer.writeByteArray(packet.publicKey.encoded) { if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(it) }
-            buffer.writeByteArray(packet.verifyToken) { if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(it) }
+            buffer.writeByteArray(packet.publicKey.encoded) {
+                if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(
+                    it
+                )
+            }
+            buffer.writeByteArray(packet.verifyToken) {
+                if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(
+                    it
+                )
+            }
         }
     }
 

@@ -36,8 +36,16 @@ data class ClientLoginEncryptionResponsePacket(var secretKey: ByteArray, var ver
             packet: ClientLoginEncryptionResponsePacket,
             connection: NettyConnection
         ) {
-            buffer.writeByteArray(packet.secretKey) { if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(it) }
-            buffer.writeByteArray(packet.verifyToken) { if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(it) }
+            buffer.writeByteArray(packet.secretKey) {
+                if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(
+                    it
+                )
+            }
+            buffer.writeByteArray(packet.verifyToken) {
+                if (version >= ProtocolVersion.MC1_8) writeVarInt(it) else writeShort(
+                    it
+                )
+            }
         }
     }
 

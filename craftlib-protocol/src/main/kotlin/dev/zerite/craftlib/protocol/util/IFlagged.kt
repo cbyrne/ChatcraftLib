@@ -1,4 +1,5 @@
 @file:JvmName("FlagUtil")
+
 package dev.zerite.craftlib.protocol.util
 
 import kotlin.reflect.safeCast

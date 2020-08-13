@@ -4,7 +4,6 @@ import dev.zerite.craftlib.protocol.Packet
 import dev.zerite.craftlib.protocol.PacketIO
 import dev.zerite.craftlib.protocol.ProtocolBuffer
 import dev.zerite.craftlib.protocol.connection.NettyConnection
-import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlayKeepAlivePacket
 import dev.zerite.craftlib.protocol.version.ProtocolVersion
 
 /**

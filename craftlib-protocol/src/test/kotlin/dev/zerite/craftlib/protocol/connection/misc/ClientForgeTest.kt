@@ -22,7 +22,6 @@ import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSetCompressio
 import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSuccessPacket
 import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayPluginMessagePacket
 import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlaySetCompressionPacket
-import dev.zerite.craftlib.protocol.packet.play.server.world.ServerPlayMapChunkBulkPacket
 import dev.zerite.craftlib.protocol.packet.status.client.ClientStatusRequestPacket
 import dev.zerite.craftlib.protocol.packet.status.server.ServerStatusResponsePacket
 import dev.zerite.craftlib.protocol.util.Crypto
@@ -191,7 +190,7 @@ suspend fun main() {
 
             override fun received(connection: NettyConnection, packet: Packet) {
                 // Check if we're in debug logging & print
-                if (debugLogging && packet !is ServerPlayMapChunkBulkPacket) println("[S->C]: $packet")
+                if (debugLogging) println("[S->C]: $packet")
 
                 when (packet) {
                     is ServerForgeHandshakeHelloPacket -> {

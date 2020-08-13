@@ -65,12 +65,14 @@ class ChatComponentTypeAdapterTest {
         ChatComponentTypeAdapter().apply {
             assertFails { JsonNull.INSTANCE.asComponent() }
             assertEquals(JsonObject().asComponent(), StringChatComponent(""))
-            assertFails { JsonPrimitive('a').apply {
-                javaClass.getDeclaredField("value").let {
-                    it.isAccessible = true
-                    it.set(this, null)
-                }
-            }.toString }
+            assertFails {
+                JsonPrimitive('a').apply {
+                    javaClass.getDeclaredField("value").let {
+                        it.isAccessible = true
+                        it.set(this, null)
+                    }
+                }.toString
+            }
             StringWriter().also { string ->
                 val json = JsonWriter(string)
                 json.write("test", 'e')

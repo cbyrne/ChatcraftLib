@@ -9,16 +9,13 @@ import dev.zerite.craftlib.protocol.connection.PacketHandler
 import dev.zerite.craftlib.protocol.packet.base.RawPacket
 import dev.zerite.craftlib.protocol.packet.handshake.client.ClientHandshakePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginEncryptionResponsePacket
-import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginPluginResponsePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginStartPacket
 import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginEncryptionRequestPacket
-import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginPluginRequestPacket
 import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSetCompressionPacket
 import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSuccessPacket
 import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayKeepAlivePacket
 import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlayKeepAlivePacket
 import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlaySetCompressionPacket
-import dev.zerite.craftlib.protocol.packet.play.server.world.ServerPlayMapChunkBulkPacket
 import dev.zerite.craftlib.protocol.util.Crypto
 import dev.zerite.craftlib.protocol.util.ext.toUuid
 import dev.zerite.craftlib.protocol.version.MinecraftProtocol
@@ -143,7 +140,7 @@ suspend fun main() {
 
             override fun received(connection: NettyConnection, packet: Packet) {
                 // Check if we're in debug logging & print
-                if (debugLogging && packet !is ServerPlayMapChunkBulkPacket && packet !is RawPacket) println("[S->C]: $packet")
+                if (debugLogging && packet !is RawPacket) println("[S->C]: $packet")
 
                 when (packet) {
                     is ServerLoginEncryptionRequestPacket -> {

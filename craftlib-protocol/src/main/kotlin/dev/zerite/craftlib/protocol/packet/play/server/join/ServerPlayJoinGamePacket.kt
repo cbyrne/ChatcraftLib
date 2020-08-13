@@ -9,7 +9,6 @@ import dev.zerite.craftlib.protocol.data.registry.impl.MagicDifficulty
 import dev.zerite.craftlib.protocol.data.registry.impl.MagicDimension
 import dev.zerite.craftlib.protocol.data.registry.impl.MagicGamemode
 import dev.zerite.craftlib.protocol.packet.base.EntityIdPacket
-import dev.zerite.craftlib.protocol.version.MinecraftProtocol
 import dev.zerite.craftlib.protocol.version.ProtocolVersion
 
 /**

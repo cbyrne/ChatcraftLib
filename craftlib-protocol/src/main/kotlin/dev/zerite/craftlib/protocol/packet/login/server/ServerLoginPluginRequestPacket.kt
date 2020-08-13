@@ -21,7 +21,7 @@ data class ServerLoginPluginRequestPacket(var messageID: Int, var channel: Strin
             buffer: ProtocolBuffer,
             version: ProtocolVersion,
             connection: NettyConnection
-        ) = ServerLoginPluginRequestPacket (
+        ) = ServerLoginPluginRequestPacket(
             buffer.readVarInt(),
             buffer.readString(),
             buffer.readByteArray()

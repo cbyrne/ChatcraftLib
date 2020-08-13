@@ -1,4 +1,5 @@
 @file:JvmName("NettyConnectionUtil")
+
 package dev.zerite.craftlib.protocol.connection
 
 import dev.zerite.craftlib.chat.component.BaseChatComponent

@@ -1,4 +1,5 @@
 @file:JvmName("ChatColorUtil")
+
 package dev.zerite.craftlib.chat.type
 
 /**

@@ -5,22 +5,10 @@ package dev.zerite.craftlib.protocol
 import dev.zerite.craftlib.chat.component.BaseChatComponent
 import dev.zerite.craftlib.chat.component.chatComponent
 import dev.zerite.craftlib.chat.component.json
-import dev.zerite.craftlib.nbt.NBTIO
-import dev.zerite.craftlib.nbt.impl.CompoundTag
-import dev.zerite.craftlib.nbt.impl.NamedTag
 import dev.zerite.craftlib.protocol.connection.NettyConnection
-import dev.zerite.craftlib.protocol.data.entity.EntityMetadata
-import dev.zerite.craftlib.protocol.data.entity.MetadataValue
-import dev.zerite.craftlib.protocol.data.entity.RotationData
 import dev.zerite.craftlib.protocol.util.ext.toUuid
-import dev.zerite.craftlib.protocol.version.ProtocolVersion
 import io.netty.buffer.ByteBuf
-import io.netty.buffer.ByteBufInputStream
 import io.netty.buffer.Unpooled
-import kotlinx.coroutines.runBlocking
-import java.io.ByteArrayOutputStream
-import java.io.DataInput
-import java.io.DataInputStream
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -620,171 +608,6 @@ class ProtocolBuffer(@Suppress("UNUSED") @JvmField val buf: ByteBuf, @JvmField v
     fun writeDouble(value: Double): ByteBuf = buf.writeDouble(value)
 
     /**
-     * Reads a NBT tag from the buffer.
-     *
-     * @param  compressed    Whether this compound is compressed with GZIP.
-     * @param  length        Reads the length from the buffer.
-     *
-     * @author Koding
-     * @since  0.1.0-SNAPSHOT
-     */
-    @JvmOverloads
-    @Suppress("UNUSED")
-    fun readNBT(
-        compressed: Boolean = connection.version <= ProtocolVersion.MC1_7_6,
-        length: ProtocolBuffer.() -> Int = { if (connection.version >= ProtocolVersion.MC1_8) 0 else readShort().toInt() }
-    ) = let {
-        val i = readerIndex
-        if (connection.version >= ProtocolVersion.MC1_8)
-            readByte().toInt().takeIf { it != 0 } ?: return@let null
-        readerIndex = i
-        length().let { len ->
-            if (len < 0) null
-            else ByteBufInputStream(buf).let {
-                runBlocking {
-                    if (compressed) NBTIO.readCompressed(it)
-                    else NBTIO.read(DataInputStream(it) as DataInput)
-                }
-            }
-        }
-    }
-
-    /**
-     * Writes a NBT tag compound into the buffer.
-     *
-     * @param  tag           The tag we need to write into the buffer.
-     * @param  compressed    Whether this tag should be compressed with GZIP.
-     * @param  length        Writes the length of the NBT to the buffer.
-     *
-     * @author Koding
-     * @since  0.1.0-SNAPSHOT
-     */
-    @JvmOverloads
-    @Suppress("UNUSED")
-    fun writeNBT(
-        tag: CompoundTag?,
-        compressed: Boolean = connection.version <= ProtocolVersion.MC1_7_6,
-        length: ProtocolBuffer.(Int) -> Unit = { if (connection.version <= ProtocolVersion.MC1_7_6) writeShort(it) }
-    ): Any = if (tag == null)
-        if (connection.version >= ProtocolVersion.MC1_8) writeByte(0)
-        else length(-1)
-    else {
-        val out = ByteArrayOutputStream()
-        NamedTag("", tag).let {
-            runBlocking {
-                if (compressed) NBTIO.writeCompressed(it, out)
-                else NBTIO.write(it, out)
-            }
-        }
-        writeByteArray(out.toByteArray()) { length(it) }
-    }
-
-    /**
-     * Reads slot data from the buffer and returns it.
-     *
-     * @author Koding
-     * @since  0.1.0-SNAPSHOT
-     */
-    fun readSlot() = Slot(readShort()).apply {
-        if (id >= 0) {
-            count = readByte()
-            damage = readShort()
-            data = readNBT()?.tag
-        }
-    }
-
-    /**
-     * Writes a slot into the buffer.
-     *
-     * @param  slot       The slot we are writing to the buffer.
-     * @author Koding
-     * @since  0.1.0-SNAPSHOT
-     */
-    fun writeSlot(slot: Slot) = slot.apply {
-        writeShort(id.toInt())
-        if (id >= 0) {
-            writeByte(count.toInt())
-            writeShort(damage.toInt())
-            writeNBT(data)
-        }
-    }
-
-    /**
-     * Reads entity metadata from the buffer.
-     *
-     * @author Koding
-     * @since  0.1.0-SNAPSHOT
-     */
-    fun readMetadata(): EntityMetadata {
-        val meta = hashMapOf<Int, MetadataValue<out Any>>()
-        loop@ while (true) {
-            val item = readByte().toInt()
-            if (item == 0x7F) break@loop
-            val type = item and 0xE0 shr 5
-            val index = item and 0x1F
-
-            meta[index] = MetadataValue(
-                index,
-                when (type) {
-                    0 -> readByte()
-                    1 -> readShort()
-                    2 -> readInt()
-                    3 -> readFloat()
-                    4 -> readString()
-                    5 -> readSlot()
-                    6 -> Vector3(
-                        readInt(),
-                        readInt(),
-                        readInt()
-                    )
-                    7 -> RotationData(
-                        readFloat(),
-                        readFloat(),
-                        readFloat()
-                    )
-                    else -> continue@loop
-                }
-            )
-        }
-        return EntityMetadata(meta)
-    }
-
-    /**
-     * Writes a metadata value into the buffer.
-     *
-     * @param  metadata          The metadata value to write.
-     * @author Koding
-     * @since  0.1.0-SNAPSHOT
-     */
-    fun writeMetadata(metadata: EntityMetadata) {
-        metadata.entries.forEach { (index, value) ->
-            val type = value.type ?: return@forEach
-            writeByte((type shl 5) or (index and 0x1F) and 0xFF)
-            when (type) {
-                0 -> writeByte((value.value as Byte).toInt())
-                1 -> writeShort((value.value as Short).toInt())
-                2 -> writeInt(value.value as Int)
-                3 -> writeFloat(value.value as Float)
-                4 -> writeString(value.value as String)
-                5 -> writeSlot(value.value as Slot)
-                6 -> {
-                    val vec = value.value as Vector3
-                    writeInt(vec.x)
-                    writeInt(vec.y)
-                    writeInt(vec.z)
-                }
-                7 -> {
-                    val rotation = value.value as RotationData
-                    writeFloat(rotation.pitch)
-                    writeFloat(rotation.yaw)
-                    writeFloat(rotation.roll)
-                }
-            }
-        }
-        writeByte(0x7F)
-    }
-
-    /**
      * Reads a fixed point number from the buffer.
      *
      * @author Koding
@@ -915,19 +738,6 @@ class ProtocolBuffer(@Suppress("UNUSED") @JvmField val buf: ByteBuf, @JvmField v
         RAW
     }
 }
-
-/**
- * Contains data about a single slot in an inventory.
- *
- * @author Koding
- * @since  0.1.0-SNAPSHOT
- */
-data class Slot @JvmOverloads constructor(
-    var id: Short,
-    var count: Byte = 0,
-    var damage: Short = 0,
-    var data: CompoundTag? = null
-)
 
 /**
  * Stores data about an object from the buffer.

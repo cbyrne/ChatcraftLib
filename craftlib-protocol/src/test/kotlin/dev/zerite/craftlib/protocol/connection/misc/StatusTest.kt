@@ -9,8 +9,6 @@ import dev.zerite.craftlib.protocol.packet.status.client.ClientStatusPingPacket
 import dev.zerite.craftlib.protocol.packet.status.client.ClientStatusRequestPacket
 import dev.zerite.craftlib.protocol.version.MinecraftProtocol
 import dev.zerite.craftlib.protocol.version.ProtocolVersion
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.net.InetAddress
 
 /**
