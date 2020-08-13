@@ -6,11 +6,18 @@ import dev.zerite.craftlib.chat.dsl.chat
 import dev.zerite.craftlib.protocol.Packet
 import dev.zerite.craftlib.protocol.connection.NettyConnection
 import dev.zerite.craftlib.protocol.connection.PacketHandler
+import dev.zerite.craftlib.protocol.packet.base.RawPacket
 import dev.zerite.craftlib.protocol.packet.handshake.client.ClientHandshakePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginEncryptionResponsePacket
+import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginPluginResponsePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginStartPacket
 import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginEncryptionRequestPacket
+import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginPluginRequestPacket
+import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSetCompressionPacket
 import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSuccessPacket
+import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayKeepAlivePacket
+import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlayKeepAlivePacket
+import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlaySetCompressionPacket
 import dev.zerite.craftlib.protocol.packet.play.server.world.ServerPlayMapChunkBulkPacket
 import dev.zerite.craftlib.protocol.util.Crypto
 import dev.zerite.craftlib.protocol.util.ext.toUuid
@@ -34,7 +41,7 @@ import java.util.*
 suspend fun main() {
     // Get the parameters
     val host = System.getProperty("client.host") ?: "127.0.0.1"
-    val port = System.getProperty("client.port")?.toIntOrNull() ?: 25566
+    val port = System.getProperty("client.port")?.toIntOrNull() ?: 25565
     var username = System.getProperty("client.username") ?: "ExampleUser"
     val password: String? = System.getProperty("client.password")
     val debugNetty = System.getProperty("client.nettyDebug")?.toBoolean() ?: true
@@ -42,7 +49,7 @@ suspend fun main() {
     val disconnectOnError = System.getProperty("client.disconnectOnError")?.toBoolean() ?: false
     val errorInterval = System.getProperty("client.errorInterval")?.toLong() ?: 1000L
     val clientToken = UUID.randomUUID()
-    val version = ProtocolVersion.MC1_7_2
+    val version = ProtocolVersion.MC1_16
 
     var accessToken: String? = null
     var uuid = System.getProperty("client.uuid")?.toUuid() ?: UUID(0, 0)
@@ -116,8 +123,8 @@ suspend fun main() {
                 connection.send(
                     ClientHandshakePacket(
                         version,
-                        "localhost",
-                        25566,
+                        host,
+                        port,
                         MinecraftProtocol.LOGIN
                     )
                 ) {
@@ -136,7 +143,7 @@ suspend fun main() {
 
             override fun received(connection: NettyConnection, packet: Packet) {
                 // Check if we're in debug logging & print
-                if (debugLogging && packet !is ServerPlayMapChunkBulkPacket) println("[S->C]: $packet")
+                if (debugLogging && packet !is ServerPlayMapChunkBulkPacket && packet !is RawPacket) println("[S->C]: $packet")
 
                 when (packet) {
                     is ServerLoginEncryptionRequestPacket -> {
@@ -188,6 +195,9 @@ suspend fun main() {
                         }
                     }
                     is ServerLoginSuccessPacket -> connection.state = MinecraftProtocol.PLAY
+                    is ServerPlaySetCompressionPacket -> connection.compressionThreshold = packet.threshold
+                    is ServerLoginSetCompressionPacket -> connection.compressionThreshold = packet.threshold
+                    is ServerPlayKeepAlivePacket -> connection.send(ClientPlayKeepAlivePacket(packet.id))
                 }
             }
 

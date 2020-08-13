@@ -9,6 +9,7 @@ import dev.zerite.craftlib.protocol.data.registry.impl.MagicDifficulty
 import dev.zerite.craftlib.protocol.data.registry.impl.MagicDimension
 import dev.zerite.craftlib.protocol.data.registry.impl.MagicGamemode
 import dev.zerite.craftlib.protocol.packet.base.EntityIdPacket
+import dev.zerite.craftlib.protocol.version.MinecraftProtocol
 import dev.zerite.craftlib.protocol.version.ProtocolVersion
 
 /**
@@ -39,11 +40,17 @@ data class ServerPlayJoinGamePacket(
         ): ServerPlayJoinGamePacket {
             val entityId = buffer.readInt()
             val gamemode = buffer.readUnsignedByte().toInt()
+            val dimension = if (version <= ProtocolVersion.MC1_9) {
+                buffer.readByte().toInt()
+            } else {
+                buffer.readInt()
+            }
+
             return ServerPlayJoinGamePacket(
                 entityId,
                 gamemode and 0x8 == 0x8,
                 MagicGamemode[version, gamemode and 0x7],
-                MagicDimension[version, buffer.readByte().toInt()],
+                MagicDimension[version, dimension],
                 MagicDifficulty[version, buffer.readUnsignedByte().toInt()],
                 buffer.readUnsignedByte().toInt(),
                 buffer.readString(),

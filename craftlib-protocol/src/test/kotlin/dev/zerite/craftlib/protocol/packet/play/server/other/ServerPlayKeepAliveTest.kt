@@ -13,13 +13,15 @@ class ServerPlayKeepAliveTest : PacketTest<ServerPlayKeepAlivePacket>(ServerPlay
 
     init {
         example(ServerPlayKeepAlivePacket(0))
-        example(ServerPlayKeepAlivePacket(Int.MAX_VALUE))
         example(ServerPlayKeepAlivePacket(512)) {
             ProtocolVersion.MC1_7_2 {
                 writeInt(512)
             }
             ProtocolVersion.MC1_8 {
                 writeVarInt(512)
+            }
+            ProtocolVersion.MC1_12_2 {
+                writeLong(512)
             }
         }
     }

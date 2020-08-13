@@ -4,6 +4,7 @@ import dev.zerite.craftlib.protocol.Packet
 import dev.zerite.craftlib.protocol.PacketIO
 import dev.zerite.craftlib.protocol.ProtocolBuffer
 import dev.zerite.craftlib.protocol.connection.NettyConnection
+import dev.zerite.craftlib.protocol.packet.play.server.other.ServerPlayKeepAlivePacket
 import dev.zerite.craftlib.protocol.version.ProtocolVersion
 
 /**
@@ -13,15 +14,27 @@ import dev.zerite.craftlib.protocol.version.ProtocolVersion
  * @author Koding
  * @since  0.1.0-SNAPSHOT
  */
-data class ClientPlayKeepAlivePacket(var id: Int) : Packet() {
+data class ClientPlayKeepAlivePacket(var id: Long) : Packet() {
     companion object : PacketIO<ClientPlayKeepAlivePacket> {
         override fun read(
             buffer: ProtocolBuffer,
             version: ProtocolVersion,
             connection: NettyConnection
-        ) = ClientPlayKeepAlivePacket(
-            if (version >= ProtocolVersion.MC1_8) buffer.readVarInt() else buffer.readInt()
-        )
+        ): ClientPlayKeepAlivePacket {
+            val keepAliveId = when {
+                version >= ProtocolVersion.MC1_12_2 -> {
+                    buffer.readLong()
+                }
+                version >= ProtocolVersion.MC1_8 -> {
+                    buffer.readVarInt().toLong()
+                }
+                else -> {
+                    buffer.readInt().toLong()
+                }
+            }
+
+            return ClientPlayKeepAlivePacket(keepAliveId)
+        }
 
         override fun write(
             buffer: ProtocolBuffer,
@@ -29,8 +42,17 @@ data class ClientPlayKeepAlivePacket(var id: Int) : Packet() {
             packet: ClientPlayKeepAlivePacket,
             connection: NettyConnection
         ) {
-            if (version >= ProtocolVersion.MC1_8) buffer.writeVarInt(packet.id)
-            else buffer.writeInt(packet.id)
+            when {
+                version >= ProtocolVersion.MC1_12_2 -> {
+                    buffer.writeLong(packet.id)
+                }
+                version >= ProtocolVersion.MC1_8 -> {
+                    buffer.writeVarInt(packet.id.toInt())
+                }
+                else -> {
+                    buffer.writeInt(packet.id.toInt())
+                }
+            }
         }
     }
 }

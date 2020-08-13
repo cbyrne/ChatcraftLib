@@ -8,6 +8,7 @@ import dev.zerite.craftlib.protocol.connection.NettyConnection
 import dev.zerite.craftlib.protocol.data.registry.RegistryEntry
 import dev.zerite.craftlib.protocol.data.registry.impl.MagicChatPosition
 import dev.zerite.craftlib.protocol.version.ProtocolVersion
+import java.util.*
 
 /**
  * Sent by the server to display a chat message in-game.
@@ -17,7 +18,8 @@ import dev.zerite.craftlib.protocol.version.ProtocolVersion
  */
 data class ServerPlayChatMessagePacket @JvmOverloads constructor(
     var message: BaseChatComponent,
-    var position: RegistryEntry = MagicChatPosition.CHAT
+    var position: RegistryEntry = MagicChatPosition.CHAT,
+    var sender: UUID? = null
 ) : Packet() {
     companion object : PacketIO<ServerPlayChatMessagePacket> {
         override fun read(
@@ -27,7 +29,8 @@ data class ServerPlayChatMessagePacket @JvmOverloads constructor(
         ) = ServerPlayChatMessagePacket(
             buffer.readChat(),
             if (version >= ProtocolVersion.MC1_8) MagicChatPosition[version, buffer.readByte()
-                .toInt()] else MagicChatPosition.CHAT
+                .toInt()] else MagicChatPosition.CHAT,
+            if(version >= ProtocolVersion.MC1_16) buffer.readUUID(ProtocolBuffer.UUIDMode.RAW) else null
         )
 
         override fun write(
@@ -39,6 +42,8 @@ data class ServerPlayChatMessagePacket @JvmOverloads constructor(
             buffer.writeChat(packet.message)
             if (version >= ProtocolVersion.MC1_8)
                 buffer.writeByte(MagicChatPosition[version, packet.position, Int::class.java] ?: 0)
+            if(version >= ProtocolVersion.MC1_16 && packet.sender != null)
+                buffer.writeUUID(mode = ProtocolBuffer.UUIDMode.RAW, value = packet.sender!!)
         }
     }
 }

@@ -9,30 +9,15 @@ import dev.zerite.craftlib.protocol.connection.io.PacketCodec
 import dev.zerite.craftlib.protocol.packet.handshake.client.ClientHandshakePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginEncryptionResponsePacket
 import dev.zerite.craftlib.protocol.packet.login.client.ClientLoginStartPacket
-import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginDisconnectPacket
-import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginEncryptionRequestPacket
-import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSetCompressionPacket
-import dev.zerite.craftlib.protocol.packet.login.server.ServerLoginSuccessPacket
-import dev.zerite.craftlib.protocol.packet.play.client.display.ClientPlayAnimationPacket
+import dev.zerite.craftlib.protocol.packet.login.server.*
 import dev.zerite.craftlib.protocol.packet.play.client.display.ClientPlayChatMessagePacket
-import dev.zerite.craftlib.protocol.packet.play.client.interaction.*
-import dev.zerite.craftlib.protocol.packet.play.client.inventory.*
-import dev.zerite.craftlib.protocol.packet.play.client.other.*
-import dev.zerite.craftlib.protocol.packet.play.client.player.*
-import dev.zerite.craftlib.protocol.packet.play.server.display.*
-import dev.zerite.craftlib.protocol.packet.play.server.entity.*
-import dev.zerite.craftlib.protocol.packet.play.server.entity.movement.*
-import dev.zerite.craftlib.protocol.packet.play.server.interaction.*
-import dev.zerite.craftlib.protocol.packet.play.server.inventory.*
+import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayClientStatusPacket
+import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayKeepAlivePacket
+import dev.zerite.craftlib.protocol.packet.play.client.other.ClientPlayTabCompletePacket
+import dev.zerite.craftlib.protocol.packet.play.client.player.ClientPlayPlayerPacket
+import dev.zerite.craftlib.protocol.packet.play.server.display.ServerPlayChatMessagePacket
 import dev.zerite.craftlib.protocol.packet.play.server.join.ServerPlayJoinGamePacket
-import dev.zerite.craftlib.protocol.packet.play.server.join.ServerPlaySpawnPositionPacket
-import dev.zerite.craftlib.protocol.packet.play.server.join.ServerPlayStatisticsPacket
 import dev.zerite.craftlib.protocol.packet.play.server.other.*
-import dev.zerite.craftlib.protocol.packet.play.server.player.ServerPlayPlayerAbilitiesPacket
-import dev.zerite.craftlib.protocol.packet.play.server.player.ServerPlayPlayerPositionLookPacket
-import dev.zerite.craftlib.protocol.packet.play.server.player.ServerPlaySetExperiencePacket
-import dev.zerite.craftlib.protocol.packet.play.server.player.ServerPlayUpdateHealthPacket
-import dev.zerite.craftlib.protocol.packet.play.server.world.*
 import dev.zerite.craftlib.protocol.packet.status.client.ClientStatusPingPacket
 import dev.zerite.craftlib.protocol.packet.status.client.ClientStatusRequestPacket
 import dev.zerite.craftlib.protocol.packet.status.server.ServerStatusPingPacket
@@ -89,17 +74,26 @@ object MinecraftProtocol : AbstractProtocol() {
         serverbound {
             ClientPlayKeepAlivePacket {
                 ProtocolVersion.MC1_7_2 to 0x00
+                ProtocolVersion.MC1_9 to 0x0B
+                ProtocolVersion.MC1_13 to 0x0E
+                ProtocolVersion.MC1_14 to 0x0F
+                ProtocolVersion.MC1_16 to 0x10
             }
             ClientPlayChatMessagePacket {
                 ProtocolVersion.MC1_7_2 to 0x01
+                ProtocolVersion.MC1_9 to 0x02
+                ProtocolVersion.MC1_13 to 0x01
+                ProtocolVersion.MC1_14 to 0x03
             }
-            ClientPlayUseEntityPacket {
+            /*ClientPlayUseEntityPacket {
                 ProtocolVersion.MC1_7_2 to 0x02
             }
             ClientPlayPlayerPacket {
                 ProtocolVersion.MC1_7_2 to 0x03
-            }
-            ClientPlayPlayerPositionPacket {
+                ProtocolVersion.MC1_9 to 0x0F
+                ProtocolVersion.MC1_14 to 0x14
+            }*/
+            /*ClientPlayPlayerPositionPacket {
                 ProtocolVersion.MC1_7_2 to 0x04
             }
             ClientPlayPlayerLookPacket {
@@ -149,14 +143,17 @@ object MinecraftProtocol : AbstractProtocol() {
             }
             ClientPlayTabCompletePacket {
                 ProtocolVersion.MC1_7_2 to 0x14
-            }
-            ClientPlayClientSettingsPacket {
+                ProtocolVersion.MC1_9 to 0x01
+            }*/
+            /*ClientPlayClientSettingsPacket {
                 ProtocolVersion.MC1_7_2 to 0x15
-            }
+            }*/
             ClientPlayClientStatusPacket {
                 ProtocolVersion.MC1_7_2 to 0x16
+                ProtocolVersion.MC1_9 to 0x03
+                ProtocolVersion.MC1_13 to 0x02
             }
-            ClientPlayPluginMessagePacket {
+            /*ClientPlayPluginMessagePacket {
                 ProtocolVersion.MC1_7_2 to 0x17
             }
             ClientPlaySpectatePacket {
@@ -164,19 +161,31 @@ object MinecraftProtocol : AbstractProtocol() {
             }
             ClientPlayResourcePackStatusPacket {
                 ProtocolVersion.MC1_8 to 0x19
-            }
+            }*/
         }
         clientbound {
             ServerPlayKeepAlivePacket {
                 ProtocolVersion.MC1_7_2 to 0x00
+                ProtocolVersion.MC1_9 to 0x1F
+                ProtocolVersion.MC1_13 to 0x21
+                ProtocolVersion.MC1_14 to 0x20
+                ProtocolVersion.MC1_15 to 0x21
+                ProtocolVersion.MC1_16 to 0x20
             }
-            ServerPlayJoinGamePacket {
+            /*ServerPlayJoinGamePacket {
                 ProtocolVersion.MC1_7_2 to 0x01
-            }
+                ProtocolVersion.MC1_9 to 0x23
+                ProtocolVersion.MC1_13 to 0x25
+                ProtocolVersion.MC1_14 to 0x26
+            }*/
             ServerPlayChatMessagePacket {
                 ProtocolVersion.MC1_7_2 to 0x02
+                ProtocolVersion.MC1_9 to 0x0F
+                ProtocolVersion.MC1_13 to 0x0E
+                ProtocolVersion.MC1_14 to 0x0F
+                ProtocolVersion.MC1_16 to 0x0E
             }
-            ServerPlayTimeUpdatePacket {
+            /*ServerPlayTimeUpdatePacket {
                 ProtocolVersion.MC1_7_2 to 0x03
             }
             ServerPlayEntityEquipmentPacket {
@@ -187,11 +196,15 @@ object MinecraftProtocol : AbstractProtocol() {
             }
             ServerPlayUpdateHealthPacket {
                 ProtocolVersion.MC1_7_2 to 0x06
-            }
+            }*/
             ServerPlayRespawnPacket {
                 ProtocolVersion.MC1_7_2 to 0x07
+                ProtocolVersion.MC1_9 to 0x33
+                ProtocolVersion.MC1_14 to 0x3A
+                ProtocolVersion.MC1_15 to 0x3B
+                ProtocolVersion.MC1_16 to -1
             }
-            ServerPlayPlayerPositionLookPacket {
+            /*ServerPlayPlayerPositionLookPacket {
                 ProtocolVersion.MC1_7_2 to 0x08
             }
             ServerPlayHeldItemChangePacket {
@@ -343,8 +356,10 @@ object MinecraftProtocol : AbstractProtocol() {
             }
             ServerPlayTabCompletePacket {
                 ProtocolVersion.MC1_7_2 to 0x3A
-            }
-            ServerPlayScoreboardObjectivePacket {
+                ProtocolVersion.MC1_9 to 0x0E
+                ProtocolVersion.MC1_13 to 0x05
+            }*/
+            /*ServerPlayScoreboardObjectivePacket {
                 ProtocolVersion.MC1_7_2 to 0x3B
             }
             ServerPlayUpdateScorePacket {
@@ -358,11 +373,16 @@ object MinecraftProtocol : AbstractProtocol() {
             }
             ServerPlayPluginMessagePacket {
                 ProtocolVersion.MC1_7_2 to 0x3F
-            }
+            }*/
             ServerPlayDisconnectPacket {
                 ProtocolVersion.MC1_7_2 to 0x40
+                ProtocolVersion.MC1_9 to 0x1A
+                ProtocolVersion.MC1_13 to 0x1B
+                ProtocolVersion.MC1_14 to 0x1A
+                ProtocolVersion.MC1_15 to 0x1B
+                ProtocolVersion.MC1_16 to 0x1A
             }
-            ServerPlayServerDifficultyPacket {
+            /*ServerPlayServerDifficultyPacket {
                 ProtocolVersion.MC1_8 to 0x41
             }
             ServerPlayCombatEventPacket {
@@ -376,11 +396,12 @@ object MinecraftProtocol : AbstractProtocol() {
             }
             ServerPlayTitlePacket {
                 ProtocolVersion.MC1_8 to 0x45
-            }
+            }*/
             ServerPlaySetCompressionPacket {
                 ProtocolVersion.MC1_8 to 0x46
+                ProtocolVersion.MC1_9 to -1
             }
-            ServerPlayPlayerListHeaderFooterPacket {
+            /*ServerPlayPlayerListHeaderFooterPacket {
                 ProtocolVersion.MC1_8 to 0x47
             }
             ServerPlayResourcePackSendPacket {
@@ -388,7 +409,7 @@ object MinecraftProtocol : AbstractProtocol() {
             }
             ServerPlayUpdateEntityNBTPacket {
                 ProtocolVersion.MC1_8 to 0x49
-            }
+            }*/
         }
     }
 
@@ -400,17 +421,21 @@ object MinecraftProtocol : AbstractProtocol() {
         serverbound {
             ClientStatusRequestPacket {
                 ProtocolVersion.MC1_7_2 to 0x00
+                ProtocolVersion.MC1_9 to 0x00
             }
             ClientStatusPingPacket {
                 ProtocolVersion.MC1_7_2 to 0x01
+                ProtocolVersion.MC1_9 to 0x01
             }
         }
         clientbound {
             ServerStatusResponsePacket {
                 ProtocolVersion.MC1_7_2 to 0x00
+                ProtocolVersion.MC1_9 to 0x00
             }
             ServerStatusPingPacket {
                 ProtocolVersion.MC1_7_2 to 0x01
+                ProtocolVersion.MC1_9 to 0x01
             }
         }
     }

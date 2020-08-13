@@ -33,7 +33,9 @@ enum class ProtocolVersion(val id: Int) {
     MC1_14_4(498),
     MC1_15(573),
     MC1_15_1(575),
-    MC1_15_2(578);
+    MC1_15_2(578),
+    MC1_16(735),
+    MC1_16_1(736);
 
     companion object {
         /**
