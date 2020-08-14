@@ -72,7 +72,7 @@ object Crypto {
      * @since  0.1.0-SNAPSHOT
      */
     private operator fun ByteArray.get(opcode: Int, key: Key) =
-        Cipher.getInstance(key.algorithm)
+        Cipher.getInstance(key.algorithm, "AndroidKeyStoreBCWorkaround")
             .apply { init(opcode, key) }
             .doFinal(this)
 
