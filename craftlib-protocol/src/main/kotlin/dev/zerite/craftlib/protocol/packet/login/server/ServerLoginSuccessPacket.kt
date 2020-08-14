@@ -21,16 +21,24 @@ data class ServerLoginSuccessPacket(var uuid: UUID, var username: String) : Pack
             buffer: ProtocolBuffer,
             version: ProtocolVersion,
             connection: NettyConnection
-        ) = ServerLoginSuccessPacket(
-            buffer.readUUID(
-                when {
-                    version >= ProtocolVersion.MC1_16 -> ProtocolBuffer.UUIDMode.RAW
-                    version < ProtocolVersion.MC1_7_6 -> ProtocolBuffer.UUIDMode.STRING
-                    else -> ProtocolBuffer.UUIDMode.DASHES
-                }
-            ),
-            buffer.readString()
-        )
+        ): ServerLoginSuccessPacket {
+            println(when {
+                version >= ProtocolVersion.MC1_16 -> ProtocolBuffer.UUIDMode.RAW
+                version < ProtocolVersion.MC1_7_6 -> ProtocolBuffer.UUIDMode.STRING
+                else -> ProtocolBuffer.UUIDMode.DASHES
+            })
+
+            return ServerLoginSuccessPacket(
+                buffer.readUUID(
+                    when {
+                        version >= ProtocolVersion.MC1_16 -> ProtocolBuffer.UUIDMode.RAW
+                        version < ProtocolVersion.MC1_7_6 -> ProtocolBuffer.UUIDMode.STRING
+                        else -> ProtocolBuffer.UUIDMode.DASHES
+                    }
+                ),
+                buffer.readString()
+            )
+        }
 
         override fun write(
             buffer: ProtocolBuffer,
