@@ -26,8 +26,8 @@ object Crypto {
      * @since  0.1.0-SNAPSHOT
      */
     fun newKeyPair(): KeyPair = KeyPairGenerator.getInstance("RSA")
-        .apply { initialize(1024) }
-        .genKeyPair()
+            .apply { initialize(1024) }
+            .genKeyPair()
 
     /**
      * Generates a new secret key using a size of 128 bits.
@@ -36,8 +36,8 @@ object Crypto {
      * @since  0.1.0-SNAPSHOT
      */
     fun newSecretKey(): SecretKey = KeyGenerator.getInstance("AES")
-        .apply { init(128) }
-        .generateKey()
+            .apply { init(128) }
+            .generateKey()
 
     /**
      * Encrypts the given byte array with the provided key.
@@ -72,9 +72,9 @@ object Crypto {
      * @since  0.1.0-SNAPSHOT
      */
     private operator fun ByteArray.get(opcode: Int, key: Key) =
-        Cipher.getInstance(key.algorithm, "AndroidKeyStoreBCWorkaround")
-            .apply { init(opcode, key) }
-            .doFinal(this)
+            Cipher.getInstance((if (key.algorithm == "RSA") "RSA/ECB/PKCS1Padding" else "AES/CFB8/NoPadding"))
+                    .apply { init(opcode, key) }
+                    .doFinal(this)
 
     /**
      * Creates a cipher with the given opcode and key.
@@ -86,8 +86,8 @@ object Crypto {
      * @since  0.1.0-SNAPSHOT
      */
     operator fun get(opcode: Int, key: Key): Cipher =
-        Cipher.getInstance("AES/CFB8/NoPadding")
-            .apply { init(opcode, key, IvParameterSpec(key.encoded)) }
+            Cipher.getInstance("AES/CFB8/NoPadding")
+                    .apply { init(opcode, key, IvParameterSpec(key.encoded)) }
 
 }
 
@@ -98,7 +98,7 @@ object Crypto {
  * @since  0.1.0-SNAPSHOT
  */
 fun ByteArray.asPublicKey(): PublicKey = KeyFactory.getInstance("RSA")
-    .generatePublic(X509EncodedKeySpec(this))
+        .generatePublic(X509EncodedKeySpec(this))
 
 /**
  * Converts the byte array into a secret key.
