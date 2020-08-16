@@ -62,14 +62,11 @@ class ChatComponentTypeAdapter : TypeAdapter<BaseChatComponent>() {
             write("action", it.action.name.toLowerCase())
             write("value", it.value)
         }
-        if(hoverReadValue != "contents") {
-            out.write("hoverEvent", input.hoverEvent) {
-                write("action", it.action.name.toLowerCase())
-                name("value")
-                write(out, it.value)
-            }
+        out.write("hoverEvent", input.hoverEvent) {
+            write("action", it.action.name.toLowerCase())
+            name(hoverReadValue)
+            write(out, it.value)
         }
-
 
         out.writeArray("extra", input.siblings.toTypedArray()) { write(out, it) }
 
@@ -151,13 +148,11 @@ class ChatComponentTypeAdapter : TypeAdapter<BaseChatComponent>() {
                 )
             }
 
-            if(hoverReadValue != "contents") {
-                this["hoverEvent"]?.asJsonObject?.let {
-                    base.hoverEvent = HoverEvent(
-                        HoverEvent.Action.valueOf(it["action"].asString.toUpperCase()),
-                        it["value"].asComponent()
-                    )
-                }
+            this["hoverEvent"]?.asJsonObject?.let {
+                base.hoverEvent = HoverEvent(
+                    HoverEvent.Action.valueOf(it["action"].asString.toUpperCase()),
+                    it[hoverReadValue].asComponent()
+                )
             }
 
             this["extra"]?.asJsonArray?.takeIf { it.size() > 0 }
