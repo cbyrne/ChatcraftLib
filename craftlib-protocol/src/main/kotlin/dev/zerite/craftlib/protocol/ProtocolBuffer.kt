@@ -422,7 +422,11 @@ class ProtocolBuffer(@Suppress("UNUSED") @JvmField val buf: ByteBuf, @JvmField v
      * @author Koding
      * @since  0.1.0-SNAPSHOT
      */
-    fun readChat() = readString().chatComponent
+    fun readChat(): () -> BaseChatComponent = {
+        val string = readString()
+        println(string)
+        string.chatComponent
+    }
 
     /**
      * Writes a chat component to the buffer by converting it
