@@ -20,6 +20,7 @@ import dev.zerite.craftlib.chat.type.HoverEvent
 class ChatComponentTypeAdapter : TypeAdapter<BaseChatComponent>() {
 
     companion object : TypeAdapterFactory {
+        var hoverReadValue = "value" // can also be content
 
         /**
          * Registers our custom type adapter with the GSON instance.
@@ -63,7 +64,7 @@ class ChatComponentTypeAdapter : TypeAdapter<BaseChatComponent>() {
         }
         out.write("hoverEvent", input.hoverEvent) {
             write("action", it.action.name.toLowerCase())
-            name("value")
+            name(hoverReadValue)
             write(out, it.value)
         }
 
@@ -150,7 +151,7 @@ class ChatComponentTypeAdapter : TypeAdapter<BaseChatComponent>() {
             this["hoverEvent"]?.asJsonObject?.let {
                 base.hoverEvent = HoverEvent(
                     HoverEvent.Action.valueOf(it["action"].asString.toUpperCase()),
-                    it["value"].asComponent()
+                    it[hoverReadValue].asComponent()
                 )
             }
 
